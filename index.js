@@ -29,4 +29,4 @@ async function run() {
     await bot.start();
 }
 
-(async () => run())();
+(async () => await run())();

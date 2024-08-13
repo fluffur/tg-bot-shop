@@ -10,11 +10,12 @@ class ProductsNotifier {
         this.apiUrl = apiUrl;
     }
 
-    async sendNewProduct(bot, chatModel, productModel, apiUrl = 'https://fakestoreapi.com') {
-        console.log('Send new product');
+    async sendNewProduct() {
+
+        console.debug('Send new product');
+
         setDefaultResultOrder("ipv4first");
 
-        console.log(this.productModel);
         const sentProducts = await this.productModel.findAll();
 
         const sentProductIds = sentProducts.map(product => product.id);
@@ -49,7 +50,7 @@ class ProductsNotifier {
     schedule() {
 
         CronJob.from({
-            onTick: async () => await this.sendNewProduct(this.bot, this.chatModel, this.productModel, this.apiUrl),
+            onTick: async () => await this.sendNewProduct(),
             cronTime: '*/1 * * * *',
             start: true
         });

@@ -12,7 +12,9 @@ async function run() {
         database: process.env.DB_DATABASE,
     });
     const chatModel = new Chat(db);
+    await chatModel.createTable();
     const productModel = new Product(db);
+    await productModel.createTable();
     const bot = new Bot(process.env.BOT_TOKEN, );
     const job = new ProductsNotifier(bot.bot, chatModel, productModel);
     job.schedule();

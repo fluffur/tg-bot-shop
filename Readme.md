@@ -3,18 +3,21 @@
 Бот, который периодически может публиковать в ваших каналах товары из https://fakestoreapi.com
 
 ## Настройка
-Требуется создать `.env` файл на основе данных из `.env.example`:
+Требуется создать `.env` файл на основе данных из `.env.example` и заполнить их:
 ```text
-BOT_TOKEN= # токен бота
-MONGODB_URI= # uri бд mongodb
-MONGODB_DATABASE= # название бд mongodb
-FAKE_STORE_API_URI=https://fakestoreapi.com
+BOT_TOKEN=
+
+DB_HOST=db
+DB_DATABASE=shop
+DB_PASSWORD=root
+DB_USER=root
+
 ```
 
 ## Запуск
-Требуется установленные `nodejs` и `npm` на вашем ПК.
+Требуются Docker и Docker Compose
 ```shell
-npm install && npm run start
+docker compose up --build
 ```
 
 ## Использование

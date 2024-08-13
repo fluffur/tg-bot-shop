@@ -2,18 +2,19 @@
   "name": "tg-bot-shop",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node bot.js"
+    "start": "node index.js"
   },
   "private": true,
   "dependencies": {
     "axios": "^1.7.3",
     "cron": "^3.1.7",
     "dotenv": "^16.4.5",
-    "mongodb": "^6.8.0",
-    "node-telegram-bot-api": "^0.66.0",
-    "telegraf": "^4.16.3"
+    "mysql": "^2.18.1",
+    "mysql2": "^3.11.0",
+    "telegraf": "^4.16.3",
+    "telegraf-session-local": "^2.1.1"
   }
 }

@@ -22,7 +22,7 @@ async function run() {
     await chatModel.createTable();
     await productModel.createTable();
 
-    const bot = new Bot(process.env.BOT_TOKEN);
+    const bot = new Bot(process.env.BOT_TOKEN, chatModel);
     const job = new ProductsNotifier(bot.bot, chatModel, productModel);
 
     job.schedule();

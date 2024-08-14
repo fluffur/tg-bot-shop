@@ -32,7 +32,7 @@ class ProductsNotifier {
 
         const chats = await this.chatModel.findAll();
         for (const chat of chats) {
-            const chat_id = chat.chat_id;
+            const chat_id = +chat.chat_id;
             const category = product.category.replaceAll(/['\s]/g, '').toLowerCase();
 
             const message = `Новый продукт: ${product.title}` +

@@ -4,7 +4,7 @@ class Product {
     }
 
     async createTable() {
-        const sql = 'CREATE TABLE IF NOT EXISTS products (id INT PRIMARY KEY AUTO_INCREMENT, product_id INT UNIQUE)';
+        const sql = 'CREATE TABLE IF NOT EXISTS products (id INT PRIMARY KEY AUTO_INCREMENT, product_id INT)';
         await this.db.query(sql);
     }
 

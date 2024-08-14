@@ -3,6 +3,7 @@ const {message} = require("telegraf/filters");
 const {Chat} = require("./Models/Chat");
 const {Product} = require("./Models/Product");
 const {Telegraf} = require("telegraf");
+const ejs = require("ejs");
 
 class Bot {
     constructor(botToken, chatModel) {
@@ -12,7 +13,8 @@ class Bot {
 
     setHandlers() {
         const helpHandler = async (ctx) => {
-            await ctx.reply('Добавьте бота в ваш канал и отправьте в этот чат команду /register');
+            const message = await ejs.renderFile(process.cwd() + '/app/Views/help.ejs');
+            await ctx.reply(message);
         };
         this.bot.start(helpHandler);
         this.bot.help(helpHandler);
@@ -53,10 +55,12 @@ class Bot {
                     const userId = ctx.message.from.id;
                     const chatId = text;
                     const member = await ctx.telegram.getChatMember(chatId, userId);
+                    console.log(chatId);
                     if (member.status !== 'administrator' && member.status !== 'creator') {
                         throw new Error('Вы не являетесь администратором или создателем данного канала');
                     }
-                    const chat = await ctx.getChat(chatId);
+                    const chat = await ctx.telegram.getChat(chatId);
+
                     const foundChat = await this.chatModel.find(chat.id);
                     if (foundChat.length > 0) {
                         await ctx.reply('Бот уже зарегестрирован в канале');
@@ -64,7 +68,7 @@ class Bot {
                         return;
                     }
 
-                    await this.chatModel.add(chat.id, userId);
+                    await this.chatModel.add(chat.id.toString(), userId.toString());
                     await ctx.reply('Бот успешно зарегестрирован в канале');
                     ctx.session.step = undefined;
                 } catch (errors) {

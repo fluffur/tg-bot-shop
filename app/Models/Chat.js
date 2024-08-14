@@ -4,7 +4,7 @@ class Chat {
     }
 
     async createTable() {
-        const sql = 'CREATE TABLE IF NOT EXISTS chats (chat_id INT PRIMARY KEY, user_id INT)';
+        const sql = 'CREATE TABLE IF NOT EXISTS chats (id INT PRIMARY KEY AUTO_INCREMENT, chat_id VARCHAR(300) UNIQUE, user_id VARCHAR(300) UNIQUE )';
         await this.db.query(sql);
     }
 

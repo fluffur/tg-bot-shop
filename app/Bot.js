@@ -1,20 +1,19 @@
 const LocalSession = require("telegraf-session-local");
-const {message} = require("telegraf/filters");
-const {Chat} = require("./Models/Chat");
-const {Product} = require("./Models/Product");
 const {Telegraf} = require("telegraf");
-const ejs = require("ejs");
+const {View} = require("./View");
+
 
 class Bot {
     constructor(botToken, chatModel) {
         this.bot = new Telegraf(botToken, {});
         this.chatModel = chatModel;
+        this.view = new View('/app/Views');
     }
+
 
     setHandlers() {
         const helpHandler = async (ctx) => {
-            const message = await ejs.renderFile(process.cwd() + '/app/Views/help.ejs');
-            await ctx.reply(message);
+            await this.view.reply(ctx, 'help');
         };
         this.bot.start(helpHandler);
         this.bot.help(helpHandler);
@@ -23,7 +22,7 @@ class Bot {
         this.bot.command('register', async (ctx) => {
             ctx.session.step = 'enter_chat';
 
-            await ctx.reply('Отправьте айди канала');
+            await this.view.reply(ctx, 'commands/register');
         });
 
         this.bot.command('cancel', async (ctx) => {
@@ -33,7 +32,7 @@ class Bot {
             }
 
             ctx.session.step = null;
-            await ctx.reply('Операция отменена');
+            await this.view.reply(ctx, 'commands/cancel');
         })
 
         this.bot.on('message', async (ctx, next) => {
@@ -50,29 +49,33 @@ class Bot {
             const step = ctx.session.step;
             if (step === 'enter_chat') {
                 const text = ctx.message.text;
+                const userId = ctx.message.from.id;
 
                 try {
-                    const userId = ctx.message.from.id;
                     const chatId = text;
                     const member = await ctx.telegram.getChatMember(chatId, userId);
-                    console.log(chatId);
-                    if (member.status !== 'administrator' && member.status !== 'creator') {
-                        throw new Error('Вы не являетесь администратором или создателем данного канала');
-                    }
-                    const chat = await ctx.telegram.getChat(chatId);
 
+                    console.log(chatId);
+
+                    if (member.status !== 'administrator' && member.status !== 'creator') {
+                        await this.view.reply(ctx, 'errors/forbidden');
+                        return;
+                    }
+
+                    const chat = await ctx.telegram.getChat(chatId);
                     const foundChat = await this.chatModel.find(chat.id);
+
                     if (foundChat.length > 0) {
-                        await ctx.reply('Бот уже зарегестрирован в канале');
-                        ctx.session.step = undefined;
+                        await this.view.reply(ctx, 'chat/already_registered');
+                        ctx.session.step = null;
                         return;
                     }
 
                     await this.chatModel.add(chat.id.toString(), userId.toString());
-                    await ctx.reply('Бот успешно зарегестрирован в канале');
-                    ctx.session.step = undefined;
+                    await this.view.reply(ctx, 'chat/success');
+                    ctx.session.step = null;
                 } catch (errors) {
-                    await ctx.reply(errors.message);
+                    await this.view.reply(ctx, 'errors/chat', {message: errors.message});
                 }
             }
 

@@ -1,6 +1,7 @@
 const {CronJob} = require("cron");
 const axios = require("axios");
 const { setDefaultResultOrder } = require("node:dns");
+const {View} = require("./View");
 
 class ProductsNotifier {
     constructor(bot, chatModel, productModel, apiUrl = 'https://fakestoreapi.com') {
@@ -8,6 +9,7 @@ class ProductsNotifier {
         this.chatModel = chatModel;
         this.productModel = productModel;
         this.apiUrl = apiUrl;
+        this.view = new View('/app/Views');
     }
 
     async sendNewProduct() {
@@ -33,14 +35,9 @@ class ProductsNotifier {
         const chats = await this.chatModel.findAll();
         for (const chat of chats) {
             const chat_id = +chat.chat_id;
-            const category = product.category.replaceAll(/['\s]/g, '').toLowerCase();
+            product.category = product.category.replaceAll(/['\s]/g, '').toLowerCase();
 
-            const message = `Новый продукт: ${product.title}` +
-                `\nЦена: $${product.price}` +
-                `\nРейтинг: ${product.rating.rate} ⭐` +
-                `\nКоличество в наличии: ${product.rating.count} шт.` +
-                `\nОписание: <blockquote>${product.description}</blockquote>` +
-                `\n#${category}`;
+            const message = await this.view.render('notifier/product', {product: product})
 
 
             await this.bot.telegram.sendPhoto(chat_id, product.image, {caption: message, parse_mode: "HTML"})
